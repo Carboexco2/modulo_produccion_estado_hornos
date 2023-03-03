@@ -1,8 +1,14 @@
 package com.carboexco.reparacionEstado.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Setter
+@Getter
+@Data
 @Table(name = "horno")
 public class Horno {
     @Id

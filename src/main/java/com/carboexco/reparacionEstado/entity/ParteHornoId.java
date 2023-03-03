@@ -2,12 +2,18 @@ package com.carboexco.reparacionEstado.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.Hibernate;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@Setter
+@Getter
+@Data
 public class ParteHornoId implements Serializable {
     private static final long serialVersionUID = -8444223700454630742L;
     @Column(name = "id_parte", nullable = false)
@@ -15,22 +21,6 @@ public class ParteHornoId implements Serializable {
 
     @Column(name = "id_horno", nullable = false, length = 7)
     private String idHorno;
-
-    public Integer getIdParte() {
-        return idParte;
-    }
-
-    public void setIdParte(Integer idParte) {
-        this.idParte = idParte;
-    }
-
-    public String getIdHorno() {
-        return idHorno;
-    }
-
-    public void setIdHorno(String idHorno) {
-        this.idHorno = idHorno;
-    }
 
     @Override
     public boolean equals(Object o) {

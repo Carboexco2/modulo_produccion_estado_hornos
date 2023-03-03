@@ -3,20 +3,17 @@ package com.carboexco.reparacionEstado.entity;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Setter
+@Getter
 @Table(name = "parte_chimenea")
 public class ParteChimenea {
     @EmbeddedId
     private ParteChimeneaId id;
-
-    public ParteChimeneaId getId() {
-        return id;
-    }
-
-    public void setId(ParteChimeneaId id) {
-        this.id = id;
-    }
 
     //TODO [JPA Buddy] generate columns from DB
 }
