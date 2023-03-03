@@ -19,20 +19,4 @@ public class Parte {
     @Column(name = "nombre_parte", nullable = false, length = 30)
     private String nombreParte;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombreParte() {
-        return nombreParte;
-    }
-
-    public void setNombreParte(String nombreParte) {
-        this.nombreParte = nombreParte;
-    }
-
 }

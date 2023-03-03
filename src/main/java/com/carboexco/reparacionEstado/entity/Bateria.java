@@ -15,7 +15,7 @@ public class Bateria {
     @Column(name = "id_bateria", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(name = "id_estado", nullable = false)
     private Estado idEstado;
 
@@ -25,48 +25,8 @@ public class Bateria {
     @Column(name = "ubicacion", nullable = false, length = 500)
     private String ubicacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "id_chimenea")
     private Chimenea idChimenea;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Estado getIdEstado() {
-        return idEstado;
-    }
-
-    public void setIdEstado(Estado idEstado) {
-        this.idEstado = idEstado;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getUbicacion() {
-        return ubicacion;
-    }
-
-    public void setUbicacion(String ubicacion) {
-        this.ubicacion = ubicacion;
-    }
-
-    public Chimenea getIdChimenea() {
-        return idChimenea;
-    }
-
-    public void setIdChimenea(Chimenea idChimenea) {
-        this.idChimenea = idChimenea;
-    }
 
 }

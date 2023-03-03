@@ -22,28 +22,4 @@ public class Ducto {
     @Column(name = "lungitud", nullable = false)
     private Integer lungitud;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombreDucto() {
-        return nombreDucto;
-    }
-
-    public void setNombreDucto(String nombreDucto) {
-        this.nombreDucto = nombreDucto;
-    }
-
-    public Integer getLungitud() {
-        return lungitud;
-    }
-
-    public void setLungitud(Integer lungitud) {
-        this.lungitud = lungitud;
-    }
-
 }
