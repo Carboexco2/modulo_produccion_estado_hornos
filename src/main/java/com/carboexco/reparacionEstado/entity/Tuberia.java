@@ -17,7 +17,7 @@ public class Tuberia {
     private Integer id;
 
     @Column(name = "nombre_tuberia", nullable = false)
-    private Integer nombreTuberia;
+    private String nombreTuberia;
 
     @Column(name = "longitud", nullable = false)
     private Integer longitud;
