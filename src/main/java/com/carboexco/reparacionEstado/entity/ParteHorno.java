@@ -1,8 +1,6 @@
 package com.carboexco.reparacionEstado.entity;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +12,10 @@ import lombok.Setter;
 public class ParteHorno {
     @EmbeddedId
     private ParteHornoId id;
+
+    @ManyToOne
+    @JoinColumn(name = "id_estado", nullable = false)
+    private Estado idEstado;
 
 
     //TODO [JPA Buddy] generate columns from DB
