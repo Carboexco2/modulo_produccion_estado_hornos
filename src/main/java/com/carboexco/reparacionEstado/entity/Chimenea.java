@@ -1,14 +1,13 @@
 package com.carboexco.reparacionEstado.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
-@Setter
 @Getter
-@Data
+@Setter
+@Entity
 @Table(name = "chimenea")
 public class Chimenea {
     @Id
@@ -21,6 +20,7 @@ public class Chimenea {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "estado_operativo", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Estado estadoOperativo;
 
 }

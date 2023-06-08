@@ -1,8 +1,12 @@
 package com.carboexco.reparacionEstado.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 public class TipoParte {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -11,20 +15,5 @@ public class TipoParte {
 
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 }
+

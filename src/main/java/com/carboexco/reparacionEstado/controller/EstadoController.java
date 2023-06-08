@@ -1,11 +1,9 @@
 package com.carboexco.reparacionEstado.controller;
 import com.carboexco.reparacionEstado.entity.Estado;
-import com.carboexco.reparacionEstado.entity.Chimenea;
 import com.carboexco.reparacionEstado.repository.EstadoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

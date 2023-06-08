@@ -1,5 +1,6 @@
 package com.carboexco.reparacionEstado.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class ElementoParte {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_parte", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Parte idParte;
 
     @Column(name = "id_elemento", nullable = false, length = 7)
@@ -23,6 +25,7 @@ public class ElementoParte {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_estado", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Estado idEstado;
 
     @Column(name = "longitud")

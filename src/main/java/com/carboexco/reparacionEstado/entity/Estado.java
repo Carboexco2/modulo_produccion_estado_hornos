@@ -1,14 +1,12 @@
 package com.carboexco.reparacionEstado.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
-@Setter
 @Getter
-@Data
+@Setter
+@Entity
 @Table(name = "estado")
 public class Estado {
     @Id
@@ -18,7 +16,5 @@ public class Estado {
 
     @Column(name = "nombre_estado", nullable = false, length = 15)
     private String nombreEstado;
-
-
 
 }
