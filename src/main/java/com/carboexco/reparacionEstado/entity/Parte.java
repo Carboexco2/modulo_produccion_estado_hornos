@@ -19,4 +19,12 @@ public class Parte {
     @Column(name = "nombre_parte", nullable = false, length = 30)
     private String nombreParte;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_prioridad", nullable = false)
+    private Prioridad idPrioridad;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_tipo_parte", nullable = false)
+    private TipoParte idTipoParte;
+
 }

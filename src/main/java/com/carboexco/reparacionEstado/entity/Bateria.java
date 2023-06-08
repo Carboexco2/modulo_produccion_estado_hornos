@@ -22,11 +22,11 @@ public class Bateria {
     @Column(name = "nombre", nullable = false, length = 500)
     private String nombre;
 
-    @Column(name = "ubicacion", nullable = false, length = 500)
-    private String ubicacion;
-
     @ManyToOne
     @JoinColumn(name = "id_chimenea")
     private Chimenea idChimenea;
+
+    @Column(name = "id_ubicacion", nullable = false)
+    private Integer idUbicacion;
 
 }

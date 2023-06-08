@@ -19,4 +19,8 @@ public class Chimenea {
     @Column(name = "nombre", nullable = false, length = 30)
     private String nombre;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "estado_operativo", nullable = false)
+    private Estado estadoOperativo;
+
 }

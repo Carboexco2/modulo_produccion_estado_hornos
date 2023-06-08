@@ -61,7 +61,7 @@ public class BateriaController {
             Bateria bateriaReturn = bateriaCurrent.get();
 
             bateriaReturn.setNombre(bateria.getNombre());
-            bateriaReturn.setUbicacion(bateria.getUbicacion());
+            bateriaReturn.setIdUbicacion(bateria.getIdUbicacion());
             bateriaReturn.setIdEstado(bateria.getIdEstado());
             bateriaReturn.setIdChimenea(bateria.getIdChimenea());
 

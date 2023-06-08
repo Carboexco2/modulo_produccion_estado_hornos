@@ -22,4 +22,11 @@ public class Ducto {
     @Column(name = "lungitud", nullable = false)
     private Integer lungitud;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_estado", nullable = false)
+    private Estado idEstado;
+
+    @Column(name = "tuberia", nullable = false)
+    private Boolean tuberia = false;
+
 }
