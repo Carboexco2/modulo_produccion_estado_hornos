@@ -8,34 +8,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.carboexco.reparacionEstado.entity.Horno;
+import com.carboexco.reparacionEstado.repository.HornoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/hornos")
+@RequestMapping("/api/hornos")
 public class HornoController {
 
     @Autowired
-    HornoRepository hornoRepository;
+    private HornoRepository hornoRepository;
 
+    // Obtener todos los hornos
     @GetMapping
-    public List<Horno> getHornoAll() {
+    public List<Horno> getAllHornos() {
         return hornoRepository.findAll();
     }
 
-    @GetMapping("/bateria/{id}")
-    public List<Horno> getTareaById(@PathVariable int id) {
-        List<Horno> hornos = hornoRepository.findAll();
-        List<Horno> hornoChimenea = new ArrayList<>();
-        for (Horno i : hornos) {
-            if (id == i.getIdBateria().getId()){
-                hornoChimenea.add(i);
-            }
-        }
-        return hornoChimenea;
-    }
-
+    // Obtener un horno por su ID
     @GetMapping("/{id}")
-    public Horno getHornobyId(@PathVariable String id) {
-
+    public Horno getHornoById(@PathVariable String id) {
         Optional<Horno> horno = hornoRepository.findById(id);
 
         if (horno.isPresent()) {
@@ -45,42 +42,37 @@ public class HornoController {
         return null;
     }
 
+    // Crear un nuevo horno
     @PostMapping
-    public Horno postHorno(@RequestBody Horno horno) {
-        hornoRepository.save(horno);
-        return horno;
+    public Horno createHorno(@RequestBody Horno horno) {
+        return hornoRepository.save(horno);
     }
 
+    // Actualizar un horno existente por su ID
     @PutMapping("/{id}")
-    public Horno putHornobyId(@PathVariable String id, @RequestBody Horno horno) {
+    public Horno updateHorno(@PathVariable String id, @RequestBody Horno horno) {
+        Optional<Horno> currentHorno = hornoRepository.findById(id);
 
-        Optional<Horno> hornoCurrent = hornoRepository.findById(id);
-
-        if (hornoCurrent.isPresent()) {
-            Horno hornoReturn = hornoCurrent.get();
-
-            hornoReturn.setIdBateria(horno.getIdBateria());
-            hornoReturn.setIdOperacion(horno.getIdOperacion());
-            hornoReturn.setIdEstado(horno.getIdEstado());
-            hornoReturn.setId(horno.getId());
-
-            hornoRepository.save(hornoReturn);
-            return hornoReturn;
+        if (currentHorno.isPresent()) {
+            Horno updatedHorno = currentHorno.get();
+            updatedHorno.setIdBateria(horno.getIdBateria());
+            updatedHorno.setIdEstado(horno.getIdEstado());
+            updatedHorno.setIdOperacion(horno.getIdOperacion());
+            return hornoRepository.save(updatedHorno);
         }
 
         return null;
     }
 
-
+    // Eliminar un horno por su ID
     @DeleteMapping("/{id}")
-    public Horno deleteHornobyId(@PathVariable String id) {
-
+    public Horno deleteHorno(@PathVariable String id) {
         Optional<Horno> horno = hornoRepository.findById(id);
 
         if (horno.isPresent()) {
-            Horno hornoReturn = horno.get();
+            Horno deletedHorno = horno.get();
             hornoRepository.deleteById(id);
-            return hornoReturn;
+            return deletedHorno;
         }
 
         return null;

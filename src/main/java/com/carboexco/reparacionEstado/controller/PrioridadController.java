@@ -7,22 +7,31 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import com.carboexco.reparacionEstado.entity.Prioridad;
+import com.carboexco.reparacionEstado.repository.PrioridadRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/prioridads")
+@RequestMapping("/api/prioridades")
 public class PrioridadController {
 
     @Autowired
-    PrioridadRepository prioridadRepository;
+    private PrioridadRepository prioridadRepository;
 
+    // Obtener todas las prioridades
     @GetMapping
-    public List<Prioridad> getPrioridadAll() {
+    public List<Prioridad> getAllPrioridades() {
         return prioridadRepository.findAll();
     }
 
+    // Obtener una prioridad por su ID
     @GetMapping("/{id}")
-    public Prioridad getPrioridadbyId(@PathVariable int id) {
-
+    public Prioridad getPrioridadById(@PathVariable int id) {
         Optional<Prioridad> prioridad = prioridadRepository.findById(id);
 
         if (prioridad.isPresent()) {
@@ -32,39 +41,35 @@ public class PrioridadController {
         return null;
     }
 
+    // Crear una nueva prioridad
     @PostMapping
-    public Prioridad postPrioridad(@RequestBody Prioridad prioridad) {
-        prioridadRepository.save(prioridad);
-        return prioridad;
+    public Prioridad createPrioridad(@RequestBody Prioridad prioridad) {
+        return prioridadRepository.save(prioridad);
     }
 
+    // Actualizar una prioridad existente por su ID
     @PutMapping("/{id}")
-    public Prioridad putPrioridadbyId(@PathVariable int id, @RequestBody Prioridad prioridad) {
+    public Prioridad updatePrioridad(@PathVariable int id, @RequestBody Prioridad prioridad) {
+        Optional<Prioridad> currentPrioridad = prioridadRepository.findById(id);
 
-        Optional<Prioridad> prioridadCurrent = prioridadRepository.findById(id);
-
-        if (prioridadCurrent.isPresent()) {
-            Prioridad prioridadReturn = prioridadCurrent.get();
-
-            prioridadReturn.setNombrePrioridad(prioridad.getNombrePrioridad());
-
-            prioridadRepository.save(prioridadReturn);
-            return prioridadReturn;
+        if (currentPrioridad.isPresent()) {
+            Prioridad updatedPrioridad = currentPrioridad.get();
+            updatedPrioridad.setNombrePrioridad(prioridad.getNombrePrioridad());
+            return prioridadRepository.save(updatedPrioridad);
         }
 
         return null;
     }
 
-
+    // Eliminar una prioridad por su ID
     @DeleteMapping("/{id}")
-    public Prioridad deletePrioridadbyId(@PathVariable int id) {
-
+    public Prioridad deletePrioridad(@PathVariable int id) {
         Optional<Prioridad> prioridad = prioridadRepository.findById(id);
 
         if (prioridad.isPresent()) {
-            Prioridad prioridadReturn = prioridad.get();
+            Prioridad deletedPrioridad = prioridad.get();
             prioridadRepository.deleteById(id);
-            return prioridadReturn;
+            return deletedPrioridad;
         }
 
         return null;

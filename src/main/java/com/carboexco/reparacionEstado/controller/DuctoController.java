@@ -13,17 +13,15 @@ import java.util.Optional;
 public class DuctoController {
 
     @Autowired
-    DuctoRepository ductoRepository;
+    private DuctoRepository ductoRepository;
 
     @GetMapping
-    public List<Ducto> getDuctoAll() {
+    public List<Ducto> getAllDuctos() {
         return ductoRepository.findAll();
     }
 
-
     @GetMapping("/{id}")
-    public Ducto getDuctobyId(@PathVariable int id) {
-
+    public Ducto getDuctoById(@PathVariable int id) {
         Optional<Ducto> ducto = ductoRepository.findById(id);
 
         if (ducto.isPresent()) {
@@ -34,39 +32,34 @@ public class DuctoController {
     }
 
     @PostMapping
-    public Ducto postDucto(@RequestBody Ducto ducto) {
-        ductoRepository.save(ducto);
-        return ducto;
+    public Ducto createDucto(@RequestBody Ducto ducto) {
+        return ductoRepository.save(ducto);
     }
 
     @PutMapping("/{id}")
-    public Ducto putDuctobyId(@PathVariable int id, @RequestBody Ducto ducto) {
+    public Ducto updateDucto(@PathVariable int id, @RequestBody Ducto ducto) {
+        Optional<Ducto> currentDucto = ductoRepository.findById(id);
 
-        Optional<Ducto> ductoCurrent = ductoRepository.findById(id);
-
-        if (ductoCurrent.isPresent()) {
-            Ducto ductoReturn = ductoCurrent.get();
-
-            ductoReturn.setNombreDucto(ducto.getNombreDucto());
-            ductoReturn.setLungitud(ducto.getLungitud());
-
-            ductoRepository.save(ductoReturn);
-            return ductoReturn;
+        if (currentDucto.isPresent()) {
+            Ducto updatedDucto = currentDucto.get();
+            updatedDucto.setNombreDucto(ducto.getNombreDucto());
+            updatedDucto.setLungitud(ducto.getLungitud());
+            updatedDucto.setIdEstado(ducto.getIdEstado());
+            updatedDucto.setTuberia(ducto.getTuberia());
+            return ductoRepository.save(updatedDucto);
         }
 
         return null;
     }
 
-
     @DeleteMapping("/{id}")
-    public Ducto deleteDuctobyId(@PathVariable int id) {
-
+    public Ducto deleteDucto(@PathVariable int id) {
         Optional<Ducto> ducto = ductoRepository.findById(id);
 
         if (ducto.isPresent()) {
-            Ducto ductoReturn = ducto.get();
+            Ducto deletedDucto = ducto.get();
             ductoRepository.deleteById(id);
-            return ductoReturn;
+            return deletedDucto;
         }
 
         return null;

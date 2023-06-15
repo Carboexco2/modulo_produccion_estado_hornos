@@ -8,25 +8,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/baterias")
+@RequestMapping("/api/baterias")
 public class BateriaController {
+    private final BateriaRepository bateriaRepository;
 
     @Autowired
-    BateriaRepository bateriaRepository;
+    public BateriaController(BateriaRepository bateriaRepository) {
+        this.bateriaRepository = bateriaRepository;
+    }
 
     @GetMapping
-    public List<Bateria> getBateriaAll() {
+    public List<Bateria> getAllBaterias() {
         return bateriaRepository.findAll();
     }
 
     @GetMapping("/chimenea/{id}")
     public List<Bateria> getTareaById(@PathVariable int id) {
-        List<Bateria> baterias = bateriaRepository.findAll();
+        List<Bateria> baterias = bateriaRepository.findByIdChimenea_IdOrderByNombreAsc(id);
         List<Bateria> bateriaChimenea = new ArrayList<>();
         for (Bateria i : baterias) {
-            if (id == i.getIdChimenea().getId()){
+            if (id == i.getIdChimenea().getId()) {
                 bateriaChimenea.add(i);
             }
         }
@@ -34,55 +42,32 @@ public class BateriaController {
     }
 
     @GetMapping("/{id}")
-    public Bateria getBateriabyId(@PathVariable int id) {
-
-        Optional<Bateria> bateria = bateriaRepository.findById(id);
-
-        if (bateria.isPresent()) {
-            return bateria.get();
-        }
-
-        return null;
+    public Optional<Bateria> getBateriaById(@PathVariable Integer id) {
+        return bateriaRepository.findById(id);
     }
 
     @PostMapping
-    public Bateria postBateria(@RequestBody Bateria bateria) {
-        bateriaRepository.save(bateria);
-        return bateria;
+    public Bateria createBateria(@RequestBody Bateria bateria) {
+        return bateriaRepository.save(bateria);
     }
 
     @PutMapping("/{id}")
-    public Bateria putBateriabyId(@PathVariable int id, @RequestBody Bateria bateria) {
-
-        Optional<Bateria> bateriaCurrent = bateriaRepository.findById(id);
-
-        if (bateriaCurrent.isPresent()) {
-            Bateria bateriaReturn = bateriaCurrent.get();
-
-            bateriaReturn.setNombre(bateria.getNombre());
-            bateriaReturn.setIdUbicacion(bateria.getIdUbicacion());
-            bateriaReturn.setIdEstado(bateria.getIdEstado());
-            bateriaReturn.setIdChimenea(bateria.getIdChimenea());
-
-            bateriaRepository.save(bateriaReturn);
-            return bateriaReturn;
+    public Bateria updateBateria(@PathVariable Integer id, @RequestBody Bateria bateriaDetails) {
+        Optional<Bateria> optionalBateria = bateriaRepository.findById(id);
+        if (optionalBateria.isPresent()) {
+            Bateria bateria = optionalBateria.get();
+            bateria.setIdEstado(bateriaDetails.getIdEstado());
+            bateria.setNombre(bateriaDetails.getNombre());
+            bateria.setIdUbicacion(bateriaDetails.getIdUbicacion());
+            bateria.setIdChimenea(bateriaDetails.getIdChimenea());
+            return bateriaRepository.save(bateria);
+        } else {
+            return null;
         }
-
-        return null;
     }
 
-
     @DeleteMapping("/{id}")
-    public Bateria deleteBateriabyId(@PathVariable int id) {
-
-        Optional<Bateria> bateria = bateriaRepository.findById(id);
-
-        if (bateria.isPresent()) {
-            Bateria bateriaReturn = bateria.get();
-            bateriaRepository.deleteById(id);
-            return bateriaReturn;
-        }
-
-        return null;
+    public void deleteBateria(@PathVariable Integer id) {
+        bateriaRepository.deleteById(id);
     }
 }

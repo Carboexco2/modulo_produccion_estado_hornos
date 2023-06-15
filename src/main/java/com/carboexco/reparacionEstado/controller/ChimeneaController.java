@@ -7,9 +7,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/chimeneas")
+@RequestMapping("/api/chimeneas")
 public class ChimeneaController {
 
     @Autowired
@@ -20,18 +26,10 @@ public class ChimeneaController {
         return chimeneaRepository.findAll();
     }
 
-
-
     @GetMapping("/{id}")
-    public Chimenea getChimeneabyId(@PathVariable int id) {
-
+    public Chimenea getChimeneaById(@PathVariable int id) {
         Optional<Chimenea> chimenea = chimeneaRepository.findById(id);
-
-        if (chimenea.isPresent()) {
-            return chimenea.get();
-        }
-
-        return null;
+        return chimenea.orElse(null);
     }
 
     @PostMapping
@@ -41,32 +39,28 @@ public class ChimeneaController {
     }
 
     @PutMapping("/{id}")
-    public Chimenea putChimeneabyId(@PathVariable int id, @RequestBody Chimenea chimenea) {
+    public Chimenea putChimeneaById(@PathVariable int id, @RequestBody Chimenea chimenea) {
+        Optional<Chimenea> currentChimenea = chimeneaRepository.findById(id);
 
-        Optional<Chimenea> chimeneaCurrent = chimeneaRepository.findById(id);
-
-        if (chimeneaCurrent.isPresent()) {
-            Chimenea chimeneaReturn = chimeneaCurrent.get();
-
-            chimeneaReturn.setNombre(chimenea.getNombre());
-
-            chimeneaRepository.save(chimeneaReturn);
-            return chimeneaReturn;
+        if (currentChimenea.isPresent()) {
+            Chimenea updatedChimenea = currentChimenea.get();
+            updatedChimenea.setNombre(chimenea.getNombre());
+            updatedChimenea.setEstadoOperativo(chimenea.getEstadoOperativo());
+            chimeneaRepository.save(updatedChimenea);
+            return updatedChimenea;
         }
 
         return null;
     }
 
-
     @DeleteMapping("/{id}")
-    public Chimenea deleteChimeneabyId(@PathVariable int id) {
-
+    public Chimenea deleteChimeneaById(@PathVariable int id) {
         Optional<Chimenea> chimenea = chimeneaRepository.findById(id);
 
         if (chimenea.isPresent()) {
-            Chimenea chimeneaReturn = chimenea.get();
+            Chimenea deletedChimenea = chimenea.get();
             chimeneaRepository.deleteById(id);
-            return chimeneaReturn;
+            return deletedChimenea;
         }
 
         return null;
