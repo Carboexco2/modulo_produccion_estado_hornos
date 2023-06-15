@@ -31,14 +31,8 @@ public class BateriaController {
 
     @GetMapping("/chimenea/{id}")
     public List<Bateria> getTareaById(@PathVariable int id) {
-        List<Bateria> baterias = bateriaRepository.findByIdChimenea_IdOrderByNombreAsc(id);
-        List<Bateria> bateriaChimenea = new ArrayList<>();
-        for (Bateria i : baterias) {
-            if (id == i.getIdChimenea().getId()) {
-                bateriaChimenea.add(i);
-            }
-        }
-        return bateriaChimenea;
+        return bateriaRepository.findByIdChimenea_IdOrderByNombreAsc(id);
+
     }
 
     @GetMapping("/{id}")
