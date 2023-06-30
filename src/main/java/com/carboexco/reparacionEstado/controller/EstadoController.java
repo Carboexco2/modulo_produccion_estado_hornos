@@ -1,84 +1,92 @@
 package com.carboexco.reparacionEstado.controller;
+
 import com.carboexco.reparacionEstado.entity.Estado;
 import com.carboexco.reparacionEstado.repository.EstadoRepository;
+import com.carboexco.reparacionEstado.security.TokenValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-import com.carboexco.reparacionEstado.entity.Estado;
-import com.carboexco.reparacionEstado.repository.EstadoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
-import com.carboexco.reparacionEstado.entity.Estado;
-import com.carboexco.reparacionEstado.repository.EstadoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
-
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/estados")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class EstadoController {
 
+    private final EstadoRepository estadoRepository;
+    private final TokenValidationService authorizador = new TokenValidationService("");
+
     @Autowired
-    private EstadoRepository estadoRepository;
+    public EstadoController(EstadoRepository estadoRepository) {
+        this.estadoRepository = estadoRepository;
+    }
 
-    // Obtener todos los estados
     @GetMapping
-    public List<Estado> getAllEstados() {
-        return estadoRepository.findAll();
+    public ResponseEntity<List<Estado>> getAllEstados(@RequestHeader("Authorization") String bearerToken) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            List<Estado> estados = estadoRepository.findAll();
+            return ResponseEntity.ok(estados);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Obtener un estado por su ID
     @GetMapping("/{id}")
-    public Estado getEstadoById(@PathVariable int id) {
-        Optional<Estado> estado = estadoRepository.findById(id);
-
-        if (estado.isPresent()) {
-            return estado.get();
+    public ResponseEntity<Estado> getEstadoById(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Estado> estado = estadoRepository.findById(id);
+            if (estado.isPresent()) {
+                return ResponseEntity.ok(estado.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Crear un nuevo estado
     @PostMapping
-    public Estado createEstado(@RequestBody Estado estado) {
-        return estadoRepository.save(estado);
+    public ResponseEntity<Estado> createEstado(@RequestHeader("Authorization") String bearerToken, @RequestBody Estado estado) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Estado createdEstado = estadoRepository.save(estado);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdEstado);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Actualizar un estado existente por su ID
     @PutMapping("/{id}")
-    public Estado updateEstado(@PathVariable int id, @RequestBody Estado estado) {
-        Optional<Estado> currentEstado = estadoRepository.findById(id);
-
-        if (currentEstado.isPresent()) {
-            Estado updatedEstado = currentEstado.get();
-            updatedEstado.setNombreEstado(estado.getNombreEstado());
-            return estadoRepository.save(updatedEstado);
+    public ResponseEntity<Estado> updateEstado(@RequestHeader("Authorization") String bearerToken, @PathVariable int id, @RequestBody Estado estado) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Estado> currentEstado = estadoRepository.findById(id);
+            if (currentEstado.isPresent()) {
+                Estado updatedEstado = currentEstado.get();
+                updatedEstado.setNombreEstado(estado.getNombreEstado());
+                estadoRepository.save(updatedEstado);
+                return ResponseEntity.ok(updatedEstado);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Eliminar un estado por su ID
     @DeleteMapping("/{id}")
-    public Estado deleteEstado(@PathVariable int id) {
-        Optional<Estado> estado = estadoRepository.findById(id);
-
-        if (estado.isPresent()) {
-            Estado deletedEstado = estado.get();
-            estadoRepository.deleteById(id);
-            return deletedEstado;
+    public ResponseEntity<Void> deleteEstado(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Estado> estado = estadoRepository.findById(id);
+            if (estado.isPresent()) {
+                estadoRepository.deleteById(id);
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

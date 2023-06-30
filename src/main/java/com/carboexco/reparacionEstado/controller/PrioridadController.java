@@ -1,77 +1,92 @@
 package com.carboexco.reparacionEstado.controller;
+
 import com.carboexco.reparacionEstado.entity.Prioridad;
 import com.carboexco.reparacionEstado.repository.PrioridadRepository;
+import com.carboexco.reparacionEstado.security.TokenValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-import com.carboexco.reparacionEstado.entity.Prioridad;
-import com.carboexco.reparacionEstado.repository.PrioridadRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
-
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/prioridades")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PrioridadController {
 
+    private final PrioridadRepository prioridadRepository;
+    private final TokenValidationService authorizador = new TokenValidationService("");
+
     @Autowired
-    private PrioridadRepository prioridadRepository;
+    public PrioridadController(PrioridadRepository prioridadRepository) {
+        this.prioridadRepository = prioridadRepository;
+    }
 
-    // Obtener todas las prioridades
     @GetMapping
-    public List<Prioridad> getAllPrioridades() {
-        return prioridadRepository.findAll();
+    public ResponseEntity<List<Prioridad>> getAllPrioridades(@RequestHeader("Authorization") String bearerToken) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            List<Prioridad> prioridades = prioridadRepository.findAll();
+            return ResponseEntity.ok(prioridades);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Obtener una prioridad por su ID
     @GetMapping("/{id}")
-    public Prioridad getPrioridadById(@PathVariable int id) {
-        Optional<Prioridad> prioridad = prioridadRepository.findById(id);
-
-        if (prioridad.isPresent()) {
-            return prioridad.get();
+    public ResponseEntity<Prioridad> getPrioridadById(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Prioridad> prioridad = prioridadRepository.findById(id);
+            if (prioridad.isPresent()) {
+                return ResponseEntity.ok(prioridad.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Crear una nueva prioridad
     @PostMapping
-    public Prioridad createPrioridad(@RequestBody Prioridad prioridad) {
-        return prioridadRepository.save(prioridad);
+    public ResponseEntity<Prioridad> createPrioridad(@RequestHeader("Authorization") String bearerToken, @RequestBody Prioridad prioridad) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Prioridad createdPrioridad = prioridadRepository.save(prioridad);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdPrioridad);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Actualizar una prioridad existente por su ID
     @PutMapping("/{id}")
-    public Prioridad updatePrioridad(@PathVariable int id, @RequestBody Prioridad prioridad) {
-        Optional<Prioridad> currentPrioridad = prioridadRepository.findById(id);
-
-        if (currentPrioridad.isPresent()) {
-            Prioridad updatedPrioridad = currentPrioridad.get();
-            updatedPrioridad.setNombrePrioridad(prioridad.getNombrePrioridad());
-            return prioridadRepository.save(updatedPrioridad);
+    public ResponseEntity<Prioridad> updatePrioridad(@RequestHeader("Authorization") String bearerToken, @PathVariable int id, @RequestBody Prioridad prioridad) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Prioridad> currentPrioridad = prioridadRepository.findById(id);
+            if (currentPrioridad.isPresent()) {
+                Prioridad updatedPrioridad = currentPrioridad.get();
+                updatedPrioridad.setNombrePrioridad(prioridad.getNombrePrioridad());
+                prioridadRepository.save(updatedPrioridad);
+                return ResponseEntity.ok(updatedPrioridad);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Eliminar una prioridad por su ID
     @DeleteMapping("/{id}")
-    public Prioridad deletePrioridad(@PathVariable int id) {
-        Optional<Prioridad> prioridad = prioridadRepository.findById(id);
-
-        if (prioridad.isPresent()) {
-            Prioridad deletedPrioridad = prioridad.get();
-            prioridadRepository.deleteById(id);
-            return deletedPrioridad;
+    public ResponseEntity<Void> deletePrioridad(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Prioridad> prioridad = prioridadRepository.findById(id);
+            if (prioridad.isPresent()) {
+                prioridadRepository.deleteById(id);
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

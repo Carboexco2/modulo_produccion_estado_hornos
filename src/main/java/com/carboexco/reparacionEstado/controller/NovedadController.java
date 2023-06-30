@@ -2,72 +2,94 @@ package com.carboexco.reparacionEstado.controller;
 
 import com.carboexco.reparacionEstado.entity.Novedad;
 import com.carboexco.reparacionEstado.repository.NovedadRepository;
+import com.carboexco.reparacionEstado.security.TokenValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/novedades")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class NovedadController {
 
+    private final NovedadRepository novedadRepository;
+    private final TokenValidationService authorizador = new TokenValidationService("");
+
     @Autowired
-    private NovedadRepository novedadRepository;
+    public NovedadController(NovedadRepository novedadRepository) {
+        this.novedadRepository = novedadRepository;
+    }
 
-    // Obtener todas las novedades
     @GetMapping
-    public List<Novedad> getAllNovedades() {
-        return novedadRepository.findAll();
+    public ResponseEntity<List<Novedad>> getAllNovedades(@RequestHeader("Authorization") String bearerToken) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            List<Novedad> novedades = novedadRepository.findAll();
+            return ResponseEntity.ok(novedades);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Obtener una novedad por su ID
     @GetMapping("/{id}")
-    public Novedad getNovedadById(@PathVariable int id) {
-        Optional<Novedad> novedad = novedadRepository.findById(id);
-
-        if (novedad.isPresent()) {
-            return novedad.get();
+    public ResponseEntity<Novedad> getNovedadById(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Novedad> novedad = novedadRepository.findById(id);
+            if (novedad.isPresent()) {
+                return ResponseEntity.ok(novedad.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Crear una nueva novedad
     @PostMapping
-    public Novedad createNovedad(@RequestBody Novedad novedad) {
-        return novedadRepository.save(novedad);
+    public ResponseEntity<Novedad> createNovedad(@RequestHeader("Authorization") String bearerToken, @RequestBody Novedad novedad) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Novedad createdNovedad = novedadRepository.save(novedad);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdNovedad);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Actualizar una novedad existente por su ID
     @PutMapping("/{id}")
-    public Novedad updateNovedad(@PathVariable int id, @RequestBody Novedad novedad) {
-        Optional<Novedad> currentNovedad = novedadRepository.findById(id);
-
-        if (currentNovedad.isPresent()) {
-            Novedad updatedNovedad = currentNovedad.get();
-            updatedNovedad.setIdUsuario(novedad.getIdUsuario());
-            updatedNovedad.setFechaHora(novedad.getFechaHora());
-            updatedNovedad.setObservacion(novedad.getObservacion());
-            updatedNovedad.setIdFoto(novedad.getIdFoto());
-            return novedadRepository.save(updatedNovedad);
+    public ResponseEntity<Novedad> updateNovedad(@RequestHeader("Authorization") String bearerToken, @PathVariable int id, @RequestBody Novedad novedad) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Novedad> currentNovedad = novedadRepository.findById(id);
+            if (currentNovedad.isPresent()) {
+                Novedad updatedNovedad = currentNovedad.get();
+                updatedNovedad.setIdUsuario(novedad.getIdUsuario());
+                updatedNovedad.setFechaHora(novedad.getFechaHora());
+                updatedNovedad.setObservacion(novedad.getObservacion());
+                updatedNovedad.setIdFoto(novedad.getIdFoto());
+                novedadRepository.save(updatedNovedad);
+                return ResponseEntity.ok(updatedNovedad);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Eliminar una novedad por su ID
     @DeleteMapping("/{id}")
-    public Novedad deleteNovedad(@PathVariable int id) {
-        Optional<Novedad> novedad = novedadRepository.findById(id);
-
-        if (novedad.isPresent()) {
-            Novedad deletedNovedad = novedad.get();
-            novedadRepository.deleteById(id);
-            return deletedNovedad;
+    public ResponseEntity<Void> deleteNovedad(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<Novedad> novedad = novedadRepository.findById(id);
+            if (novedad.isPresent()) {
+                novedadRepository.deleteById(id);
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

@@ -2,69 +2,95 @@ package com.carboexco.reparacionEstado.controller;
 
 import com.carboexco.reparacionEstado.entity.ElementoParte;
 import com.carboexco.reparacionEstado.repository.ElementoParteRepository;
+import com.carboexco.reparacionEstado.security.TokenValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/elementos-parte")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ElementoParteController {
 
+    private final ElementoParteRepository elementoParteRepository;
+    private final TokenValidationService authorizador = new TokenValidationService("");
+
     @Autowired
-    private ElementoParteRepository elementoParteRepository;
+    public ElementoParteController(ElementoParteRepository elementoParteRepository) {
+        this.elementoParteRepository = elementoParteRepository;
+    }
 
     @GetMapping
-    public List<ElementoParte> getAllElementosParte() {
-        return elementoParteRepository.findAll();
+    public ResponseEntity<List<ElementoParte>> getAllElementosParte(@RequestHeader("Authorization") String bearerToken) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            List<ElementoParte> elementosParte = elementoParteRepository.findAll();
+            return ResponseEntity.ok(elementosParte);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @GetMapping("/{id}")
-    public ElementoParte getElementoParteById(@PathVariable int id) {
-        Optional<ElementoParte> elementoParte = elementoParteRepository.findById(id);
-
-        if (elementoParte.isPresent()) {
-            return elementoParte.get();
+    public ResponseEntity<ElementoParte> getElementoParteById(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<ElementoParte> elementoParte = elementoParteRepository.findById(id);
+            if (elementoParte.isPresent()) {
+                return ResponseEntity.ok(elementoParte.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping
-    public ElementoParte createElementoParte(@RequestBody ElementoParte elementoParte) {
-        return elementoParteRepository.save(elementoParte);
+    public ResponseEntity<ElementoParte> createElementoParte(@RequestHeader("Authorization") String bearerToken, @RequestBody ElementoParte elementoParte) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            ElementoParte createdElementoParte = elementoParteRepository.save(elementoParte);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdElementoParte);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PutMapping("/{id}")
-    public ElementoParte updateElementoParte(@PathVariable int id, @RequestBody ElementoParte elementoParte) {
-        Optional<ElementoParte> currentElementoParte = elementoParteRepository.findById(id);
-
-        if (currentElementoParte.isPresent()) {
-            ElementoParte updatedElementoParte = currentElementoParte.get();
-            updatedElementoParte.setIdParte(elementoParte.getIdParte());
-            updatedElementoParte.setIdElemento(elementoParte.getIdElemento());
-            updatedElementoParte.setIdEstado(elementoParte.getIdEstado());
-            updatedElementoParte.setLongitud(elementoParte.getLongitud());
-            updatedElementoParte.setNombre(elementoParte.getNombre());
-            return elementoParteRepository.save(updatedElementoParte);
+    public ResponseEntity<ElementoParte> updateElementoParte(@RequestHeader("Authorization") String bearerToken, @PathVariable int id, @RequestBody ElementoParte elementoParte) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<ElementoParte> currentElementoParte = elementoParteRepository.findById(id);
+            if (currentElementoParte.isPresent()) {
+                ElementoParte updatedElementoParte = currentElementoParte.get();
+                updatedElementoParte.setIdParte(elementoParte.getIdParte());
+                updatedElementoParte.setIdElemento(elementoParte.getIdElemento());
+                updatedElementoParte.setIdEstado(elementoParte.getIdEstado());
+                updatedElementoParte.setLongitud(elementoParte.getLongitud());
+                updatedElementoParte.setNombre(elementoParte.getNombre());
+                elementoParteRepository.save(updatedElementoParte);
+                return ResponseEntity.ok(updatedElementoParte);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @DeleteMapping("/{id}")
-    public ElementoParte deleteElementoParte(@PathVariable int id) {
-        Optional<ElementoParte> elementoParte = elementoParteRepository.findById(id);
-
-        if (elementoParte.isPresent()) {
-            ElementoParte deletedElementoParte = elementoParte.get();
-            elementoParteRepository.deleteById(id);
-            return deletedElementoParte;
+    public ResponseEntity<Void> deleteElementoParte(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<ElementoParte> elementoParte = elementoParteRepository.findById(id);
+            if (elementoParte.isPresent()) {
+                elementoParteRepository.deleteById(id);
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
-

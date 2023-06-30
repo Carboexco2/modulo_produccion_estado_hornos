@@ -2,70 +2,91 @@ package com.carboexco.reparacionEstado.controller;
 
 import com.carboexco.reparacionEstado.entity.TipoParte;
 import com.carboexco.reparacionEstado.repository.TipoParteRepository;
+import com.carboexco.reparacionEstado.security.TokenValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/tipos-parte")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TipoParteController {
 
+    private final TipoParteRepository tipoParteRepository;
+    private final TokenValidationService authorizador = new TokenValidationService("");
+
     @Autowired
-    private TipoParteRepository tipoParteRepository;
+    public TipoParteController(TipoParteRepository tipoParteRepository) {
+        this.tipoParteRepository = tipoParteRepository;
+    }
 
-    // Obtener todos los tipos de parte
     @GetMapping
-    public List<TipoParte> getAllTiposParte() {
-        return tipoParteRepository.findAll();
+    public ResponseEntity<List<TipoParte>> getAllTiposParte(@RequestHeader("Authorization") String bearerToken) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            List<TipoParte> tiposParte = tipoParteRepository.findAll();
+            return ResponseEntity.ok(tiposParte);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Obtener un tipo de parte por su ID
     @GetMapping("/{id}")
-    public TipoParte getTipoParteById(@PathVariable int id) {
-        Optional<TipoParte> tipoParte = tipoParteRepository.findById(id);
-
-        if (tipoParte.isPresent()) {
-            return tipoParte.get();
+    public ResponseEntity<TipoParte> getTipoParteById(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<TipoParte> tipoParte = tipoParteRepository.findById(id);
+            if (tipoParte.isPresent()) {
+                return ResponseEntity.ok(tipoParte.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Crear un nuevo tipo de parte
     @PostMapping
-    public TipoParte createTipoParte(@RequestBody TipoParte tipoParte) {
-        return tipoParteRepository.save(tipoParte);
+    public ResponseEntity<TipoParte> createTipoParte(@RequestHeader("Authorization") String bearerToken, @RequestBody TipoParte tipoParte) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            TipoParte createdTipoParte = tipoParteRepository.save(tipoParte);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdTipoParte);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Actualizar un tipo de parte existente por su ID
     @PutMapping("/{id}")
-    public TipoParte updateTipoParte(@PathVariable int id, @RequestBody TipoParte tipoParte) {
-        Optional<TipoParte> currentTipoParte = tipoParteRepository.findById(id);
-
-        if (currentTipoParte.isPresent()) {
-            TipoParte updatedTipoParte = currentTipoParte.get();
-            updatedTipoParte.setNombre(tipoParte.getNombre());
-            return tipoParteRepository.save(updatedTipoParte);
+    public ResponseEntity<TipoParte> updateTipoParte(@RequestHeader("Authorization") String bearerToken, @PathVariable int id, @RequestBody TipoParte tipoParte) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<TipoParte> currentTipoParte = tipoParteRepository.findById(id);
+            if (currentTipoParte.isPresent()) {
+                TipoParte updatedTipoParte = currentTipoParte.get();
+                updatedTipoParte.setNombre(tipoParte.getNombre());
+                tipoParteRepository.save(updatedTipoParte);
+                return ResponseEntity.ok(updatedTipoParte);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Eliminar un tipo de parte por su ID
     @DeleteMapping("/{id}")
-    public TipoParte deleteTipoParte(@PathVariable int id) {
-        Optional<TipoParte> tipoParte = tipoParteRepository.findById(id);
-
-        if (tipoParte.isPresent()) {
-            TipoParte deletedTipoParte = tipoParte.get();
-            tipoParteRepository.deleteById(id);
-            return deletedTipoParte;
+    public ResponseEntity<Void> deleteTipoParte(@RequestHeader("Authorization") String bearerToken, @PathVariable int id) {
+        authorizador.setBearerToken(bearerToken);
+        if (authorizador.callValidateTokenEndpoint().getStatusCodeValue() == 200) {
+            Optional<TipoParte> tipoParte = tipoParteRepository.findById(id);
+            if (tipoParte.isPresent()) {
+                tipoParteRepository.deleteById(id);
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
-

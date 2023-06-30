@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class statusController {
     @GetMapping({"/status"})
     public String status(){
-        return "ok";
+        return "ESTADO DE LA API REST DEL MODULO_PRODUCCION_REPARACIONESTADO";
     }
 }
